@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <style name="Theme.App" parent="Theme.MaterialComponents">
+        <item name="materialCardViewStyle">@style/Widget.App.CardView</item>
+    </style>
+
+    <style name="Widget.App.CardView" parent="Widget.MaterialComponents.CardView">
+        <item name="materialThemeOverlay">@style/ThemeOverlay.App.Card</item>
+    </style>
+
+    <style name="ThemeOverlay.App.Card" parent="">
+        <item name="colorPrimary">@color/red_400</item>
+        <item name="colorSurface">@color/red_400</item>
+        <item name="colorOnSurface">@color/red_700</item>
+    </style>
+    <style name="AppTheme" parent="Theme.MaterialComponents">
+
+        <!-- BONUS READING: override material colors here, too https://material.io/develop/android/theming/color -->
+
+        <!-- override DialogFragment theme of those spawned by activities with this theme -->
+        <item name="android:dialogTheme">@style/AppTheme.Dialog</item>
+
+    </style>
+
+    <style name="AppTheme.Dialog" parent="ThemeOverlay.MaterialComponents.Dialog">
+
+        <!-- add a minimun width to the dialog, so it's not too narrow -->
+        <item name="android:windowMinWidthMajor">@dimen/abc_dialog_min_width_major</item>
+        <item name="android:windowMinWidthMinor">@dimen/abc_dialog_min_width_minor</item>
+
+        <!-- display the title for dialogs -->
+        <item name="android:windowNoTitle">false</item>
+    </style>
+    <style name="Divider">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">1dp</item>
+        <item name="android:background">?android:attr/listDivider</item>
+    </style>
+</resources>
