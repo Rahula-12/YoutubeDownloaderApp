@@ -25,7 +25,9 @@ import java.util.*
 import java.util.regex.Pattern
 import android.text.TextUtils
 
-class YoutubeDownloaderViewModel(private val dao:VideoUrlDao,private val context: Context):ViewModel() {
+class YoutubeDownloaderViewModel(private val dao:VideoUrlDao,
+                                 private val context: Context):ViewModel()
+{
     val urls:LiveData<List<VideoUrls>> = dao.getUrls().asLiveData()
     private var downloadUrl:String=""
     private var deleteUrl:String=""
