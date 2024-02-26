@@ -20,58 +20,72 @@ import com.example.youtubedownloader.viewmodel.YoutubeDownloaderViewModelFactory
 
 
 class OptionFragment : Fragment() {
-   private lateinit var binding:FragmentOptionBinding
-   private val STORAGE_REQUEST_CODE=1
-   private val viewModel:YoutubeDownloaderViewModel by activityViewModels{
-       YoutubeDownloaderViewModelFactory(
-           (activity?.application as VideoApplication).database.itemDao(),requireContext()
-       )
-   }
+    private lateinit var binding: FragmentOptionBinding
+    private val STORAGE_REQUEST_CODE = 1
+    // ViewModel initialization using activityViewModels delegate and custom ViewModelFactory
+    private val viewModel: YoutubeDownloaderViewModel by activityViewModels {
+        YoutubeDownloaderViewModelFactory(
+            (activity?.application as VideoApplication).database.itemDao(),
+            requireContext().applicationContext
+        )
+    }
+
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
         // Inflate the layout for this fragment
-        binding=FragmentOptionBinding.inflate(inflater,container,false)
-        viewModel.thumbnail.observe(viewLifecycleOwner){
-            if(it!="")
-            {
-                context?.let { it1 -> Glide.with(it1).
-                load(it).fitCenter().placeholder(R.drawable.loading_spinner)
+        binding = FragmentOptionBinding.inflate(inflater, container, false)
+
+        // Observing thumbnail changes from ViewModel
+        viewModel.thumbnail.observe(viewLifecycleOwner) { thumbnailUrl ->
+            if (thumbnailUrl.isNotBlank()) {
+                context?.let { Glide.with(it)
+                    .load(thumbnailUrl)
+                    .fitCenter()
+                    .placeholder(R.drawable.loading_spinner)
+                    .into(binding.thumbnail) }
+            } else {
+                context?.let { Glide.with(it)
+                    .load(R.drawable.loading_spinner)
+                    .fitCenter()
                     .into(binding.thumbnail) }
             }
-            else
-                context?.let { it1 -> Glide.with(it1).
-                load(R.drawable.loading_spinner).fitCenter()
-                    .into(binding.thumbnail) }
         }
-        viewModel.title.observe(viewLifecycleOwner){
-            binding.title.text=it
+
+        // Observing title changes from ViewModel
+        viewModel.title.observe(viewLifecycleOwner) { title ->
+            binding.title.text = title
         }
-        viewModel.downloadCompleted.observe(viewLifecycleOwner)
-        {
-            if(it) {
-                congratulationsDialog("Downloading Completed")
+
+        // Observing download completion from ViewModel
+        viewModel.downloadCompleted.observe(viewLifecycleOwner) { downloadCompleted ->
+            if (downloadCompleted) {
+                congratulationsDialog()
             }
         }
-        binding.deleteUrl.setOnClickListener{
+
+        // OnClickListener for deleteUrl button
+        binding.deleteUrl.setOnClickListener {
             SweetAlertDialog(context, SweetAlertDialog.WARNING_TYPE)
                 .setTitleText("Delete URL")
                 .setContentText("Do you want to delete this URL?")
                 .setConfirmText("Yes")
                 .setConfirmClickListener {
                     viewModel.deleteUrl()
-                        it.setTitleText("Deleted!")
+                    it.setTitleText("Deleted!")
                         .setContentText("URL has been deleted!")
                         .setConfirmText("OK")
                         .setConfirmClickListener(null)
-                        .changeAlertType(SweetAlertDialog.SUCCESS_TYPE);
+                        .changeAlertType(SweetAlertDialog.SUCCESS_TYPE)
                     findNavController().navigate(R.id.action_optionFragment_to_searchedVideos)
                 }.setCancelClickListener {
                     it.dismiss()
                 }
                 .show()
         }
+
+        // OnClickListener for downloadVideo button
         binding.downloadVideo.setOnClickListener {
             if (context?.let { it1 ->
                     ContextCompat.checkSelfPermission(
@@ -80,63 +94,76 @@ class OptionFragment : Fragment() {
                     )
                 } == PackageManager.PERMISSION_GRANTED
             ) {
-                val builder = AlertDialog.Builder(context)
-                val sizes: Array<String> = arrayOf("640 X 360", "1280 X 720")
-                builder.setTitle("Select size")
-                builder.setSingleChoiceItems(sizes, 0) { dialog, pos ->
-                    viewModel.outPutVideos(pos)
-                    dialog.dismiss()
-                }
-                builder.show()
-            }
-            else if(shouldShowRequestPermissionRationale(Manifest.permission.WRITE_EXTERNAL_STORAGE))
-            {
-                SweetAlertDialog(context, SweetAlertDialog.WARNING_TYPE)
-                    .setTitleText("Storage Permission")
-                    .setContentText("Without Storage Permission, you will not be able to download video.")
-                    .setConfirmText("OK").setConfirmClickListener {
-                        requestPermissions(arrayOf(Manifest.permission.WRITE_EXTERNAL_STORAGE),STORAGE_REQUEST_CODE)
-                        it.dismiss()
-                    }.setCancelText("NO THANKS").
-                    setCancelClickListener {
-                        it.dismiss()
-                    }
-                    .show()
-            }
-            else{
-                requestPermissions(arrayOf(Manifest.permission.WRITE_EXTERNAL_STORAGE),STORAGE_REQUEST_CODE)
+                // Show dialog to select video size
+                showSizeSelectionDialog()
+            } else if (shouldShowRequestPermissionRationale(Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
+                // Show rationale for storage permission
+                showStoragePermissionRationale()
+            } else {
+                // Request storage permission
+                requestPermissions(arrayOf(Manifest.permission.WRITE_EXTERNAL_STORAGE), STORAGE_REQUEST_CODE)
             }
         }
         return binding.root
     }
 
     override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<String>, grantResults: IntArray) {
-        when(requestCode){
-            STORAGE_REQUEST_CODE->{
-                if(grantResults.isNotEmpty() && grantResults[0]==PackageManager.PERMISSION_GRANTED)
-                {
-
-                }
-                else
-                {
-                    SweetAlertDialog(context, SweetAlertDialog.WARNING_TYPE)
-                        .setTitleText("Storage Permission")
-                        .setContentText("Storage Permission required to download video.")
-                        .setConfirmText("OK")
-                        .show()
+        when (requestCode) {
+            STORAGE_REQUEST_CODE -> {
+                if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    // Storage permission granted, handle accordingly
+                } else {
+                    // Storage permission denied, show alert
+                    showStoragePermissionDeniedAlert()
                 }
                 return
-            }
-            else->{
-
             }
         }
     }
 
-    private fun Fragment.congratulationsDialog(msg:String){
+    // Function to display congratulations dialog
+    private fun Fragment.congratulationsDialog() {
         SweetAlertDialog(context, SweetAlertDialog.SUCCESS_TYPE)
             .setTitleText("Congratulations")
             .setContentText("Video has been downloaded.")
+            .show()
+    }
+
+    // Function to show dialog for selecting video size
+    private fun showSizeSelectionDialog() {
+        val builder = AlertDialog.Builder(context)
+        val sizes: Array<String> = arrayOf("640 X 360", "1280 X 720")
+        builder.setTitle("Select size")
+        builder.setSingleChoiceItems(sizes, 0) { dialog, pos ->
+            viewModel.outPutVideos(pos)
+            dialog.dismiss()
+        }
+        builder.show()
+    }
+
+    // Function to show rationale for storage permission
+    private fun showStoragePermissionRationale() {
+        SweetAlertDialog(context, SweetAlertDialog.WARNING_TYPE)
+            .setTitleText("Storage Permission")
+            .setContentText("Without Storage Permission, you will not be able to download video.")
+            .setConfirmText("OK")
+            .setConfirmClickListener {
+                requestPermissions(arrayOf(Manifest.permission.WRITE_EXTERNAL_STORAGE), STORAGE_REQUEST_CODE)
+                it.dismiss()
+            }
+            .setCancelText("NO THANKS")
+            .setCancelClickListener {
+                it.dismiss()
+            }
+            .show()
+    }
+
+    // Function to show alert for denied storage permission
+    private fun showStoragePermissionDeniedAlert() {
+        SweetAlertDialog(context, SweetAlertDialog.WARNING_TYPE)
+            .setTitleText("Storage Permission")
+            .setContentText("Storage Permission required to download video.")
+            .setConfirmText("OK")
             .show()
     }
 }
