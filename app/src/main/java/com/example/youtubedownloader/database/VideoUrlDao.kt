@@ -12,6 +12,6 @@ interface VideoUrlDao {
     @Insert(onConflict = OnConflictStrategy.IGNORE)
     suspend fun insertUrl(videoUrl:VideoUrls)
 
-    @Query("Delete from VideoUrls where VideoUrl=:url")
+    @Query("DELETE from VideoUrls where VideoUrl=:url")
     suspend fun deleteUrl(url:String)
 }
