@@ -5,23 +5,16 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.example.youtubedownloader.database.VideoApplication
 import com.example.youtubedownloader.databinding.FragmentSearchedVideosBinding
 import com.example.youtubedownloader.recyclerView.VideoUrlAdapter
 import com.example.youtubedownloader.viewmodel.YoutubeDownloaderViewModel
-import com.example.youtubedownloader.viewmodel.YoutubeDownloaderViewModelFactory
 
 
 class SearchedVideos : Fragment(), ItemClicked {
     private lateinit var binding:FragmentSearchedVideosBinding
-    private val viewModel:YoutubeDownloaderViewModel by activityViewModels{
-        YoutubeDownloaderViewModelFactory(
-            (activity?.application as VideoApplication).database.itemDao(),requireContext()
-        )
-    }
+    private lateinit var viewModel:YoutubeDownloaderViewModel
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
