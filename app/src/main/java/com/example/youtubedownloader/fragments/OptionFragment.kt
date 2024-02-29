@@ -8,27 +8,19 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
 import cn.pedant.SweetAlert.SweetAlertDialog
 import com.bumptech.glide.Glide
 import com.example.youtubedownloader.R
-import com.example.youtubedownloader.database.VideoApplication
 import com.example.youtubedownloader.databinding.FragmentOptionBinding
 import com.example.youtubedownloader.viewmodel.YoutubeDownloaderViewModel
-import com.example.youtubedownloader.viewmodel.YoutubeDownloaderViewModelFactory
 
 
 class OptionFragment : Fragment() {
     private lateinit var binding: FragmentOptionBinding
     private val STORAGE_REQUEST_CODE = 1
     // ViewModel initialization using activityViewModels delegate and custom ViewModelFactory
-    private val viewModel: YoutubeDownloaderViewModel by activityViewModels {
-        YoutubeDownloaderViewModelFactory(
-            (activity?.application as VideoApplication).database.itemDao(),
-            requireContext().applicationContext
-        )
-    }
+    private lateinit var viewModel: YoutubeDownloaderViewModel
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
