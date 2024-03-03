@@ -9,9 +9,9 @@ interface VideoUrlDao {
     @Query("SELECT * FROM VideoUrls order by date desc")
     fun getUrls(): Flow<List<VideoUrls>>
 
-    @Insert(onConflict = OnConflictStrategy.IGNORE)
-    suspend fun insertUrl(videoUrl:VideoUrls)
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    fun insertUrl(videoUrls: VideoUrls)
 
-    @Query("DELETE from VideoUrls where VideoUrl=:url")
-    suspend fun deleteUrl(url:String)
+    @Query("delete from videourls where videourl=:url")
+    fun deleteUrl(url:String)
 }

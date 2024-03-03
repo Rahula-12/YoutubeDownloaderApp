@@ -1,5 +1,6 @@
 package com.example.youtubedownloader.repositories
 
+import android.util.Log
 import com.example.youtubedownloader.database.VideoUrlDao
 import com.example.youtubedownloader.database.VideoUrls
 import javax.inject.Inject
@@ -8,7 +9,12 @@ class VideoUrlsDBRepository @Inject constructor(private val videoUrlDao: VideoUr
 
     fun getUrls()=videoUrlDao.getUrls()
 
-    suspend fun insertUrl(videoUrl: VideoUrls)=videoUrlDao.insertUrl(videoUrl)
+    fun insertUrl(videoUrl: VideoUrls){
+        Log.d("title update inside fun","title=${videoUrl.title} time=${System.currentTimeMillis()}")
+        videoUrlDao.insertUrl(videoUrl)
+    }
 
-    suspend fun deleteUrl(url:String)=videoUrlDao.deleteUrl(url)
+    fun deleteUrl(url:String) {
+         videoUrlDao.deleteUrl(url)
+     }
 }
