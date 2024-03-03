@@ -1,28 +1,16 @@
 package com.example.youtubedownloader.viewmodel
 
 import android.annotation.SuppressLint
-import android.app.DownloadManager
-import android.content.BroadcastReceiver
-import android.content.Context
-import android.content.Intent
-import android.content.IntentFilter
-import android.media.MediaScannerConnection
-import android.net.Uri
-import android.os.Environment
-import android.os.Environment.DIRECTORY_DOWNLOADS
 import android.text.TextUtils
 import android.util.Log
 import androidx.lifecycle.*
-import com.android.volley.Request
-import com.android.volley.toolbox.JsonObjectRequest
-import com.android.volley.toolbox.Volley
 import com.example.youtubedownloader.data.VideoItem
 import com.example.youtubedownloader.database.VideoUrls
 import com.example.youtubedownloader.repositories.VideoUrlsDBRepository
 import com.example.youtubedownloader.repositories.VideoUrlsNetworkRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import java.io.File
 import java.text.SimpleDateFormat
 import java.util.*
 import java.util.regex.Pattern
@@ -66,15 +54,27 @@ class YoutubeDownloaderViewModel @Inject constructor(
         val sdf = SimpleDateFormat("dd/MM/yyyy")
         val date = sdf.format(Date()).toString()
         val time = Calendar.getInstance().time.toString()
-        val title=videoUrlsNetworkRepository.insertUrlRequestIntoQueue(getYoutubeID(url))
-        viewModelScope.launch {
-            videoUrlsDBRepository.insertUrl(VideoUrls(videoUrl = url, title = title, date = date, time = time))
+        var title = ""
+        viewModelScope.launch(Dispatchers.IO) {
+            val temp2 = videoUrlsNetworkRepository.insertUrlRequestIntoQueue(
+                getYoutubeID(url)
+            )
+            title = temp2
+            Log.d("title", title)
+            videoUrlsDBRepository.insertUrl(
+                VideoUrls(
+                    videoUrl = url,
+                    title = title,
+                    date = date,
+                    time = time
+                )
+            )
         }
     }
 
     fun deleteUrl() {
         // Deleting URL from the database
-        viewModelScope.launch {
+        viewModelScope.launch(Dispatchers.IO) {
             videoUrlsDBRepository.deleteUrl(deleteUrl)
         }
         resetAll()
@@ -89,11 +89,15 @@ class YoutubeDownloaderViewModel @Inject constructor(
 
     fun outPutVideos(pos: Int) {
         // Processing video download request
-        outputUrls.addAll(videoUrlsNetworkRepository.outputVideosRequestIntoQueue(pos,getYoutubeID(downloadUrl), updateDownloadId = {
-            downloadId=it
-        }, updateDownloadLiveData = {
-            if(downloadId==it)  _downloadCompleted.value=true
-        }))
+        viewModelScope.launch {
+            val list=videoUrlsNetworkRepository.outputVideosRequestIntoQueue(pos,getYoutubeID(downloadUrl), updateDownloadId = {
+                downloadId=it
+            }, updateDownloadLiveData = {
+                if(downloadId==it)  _downloadCompleted.value=true
+            })
+            Log.d("List",list.size.toString())
+            outputUrls.addAll(list)
+        }
     }
 
     fun resetAll() {
@@ -113,9 +117,11 @@ class YoutubeDownloaderViewModel @Inject constructor(
 
     private fun thumbUrlAndTitle() {
         // Fetching thumbnail and title from API
-        val list=videoUrlsNetworkRepository.insertThumbUrlAndTitleRequestIntoQueue(getYoutubeID(downloadUrl))
-        _thumbnail.value=list[0]
-        _title.value=list[1]
+        videoUrlsNetworkRepository.insertThumbUrlAndTitleRequestIntoQueue(getYoutubeID(downloadUrl), updateThumbAndTitle = {
+            s1,s2->
+            _thumbnail.value=s1
+            _title.value=s2
+        })
     }
 
     private fun getYoutubeID(youtubeUrl: String): String? {
