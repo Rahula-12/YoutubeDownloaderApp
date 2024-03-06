@@ -8,7 +8,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.fragment.app.DialogFragment
-import androidx.fragment.app.viewModels
+import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
 import com.example.youtubedownloader.R
 import com.example.youtubedownloader.databinding.FragmentDialogUrlBinding
@@ -18,7 +18,7 @@ import dagger.hilt.android.AndroidEntryPoint
 @AndroidEntryPoint
 class DialogUrl : DialogFragment() {
        private lateinit var binding:FragmentDialogUrlBinding
-    private val viewModel:YoutubeDownloaderViewModel by viewModels()
+    private val viewModel:YoutubeDownloaderViewModel by activityViewModels()
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         binding= FragmentDialogUrlBinding.inflate(inflater,container,false)
         dialog?.setTitle("Video Url")

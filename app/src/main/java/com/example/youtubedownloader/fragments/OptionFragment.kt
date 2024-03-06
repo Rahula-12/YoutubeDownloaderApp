@@ -8,6 +8,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import cn.pedant.SweetAlert.SweetAlertDialog
@@ -23,7 +24,7 @@ class OptionFragment : Fragment() {
     private lateinit var binding: FragmentOptionBinding
     private val STORAGE_REQUEST_CODE = 1
     // ViewModel initialization using activityViewModels delegate and custom ViewModelFactory
-    private val viewModel:YoutubeDownloaderViewModel by viewModels()
+    private val viewModel:YoutubeDownloaderViewModel by activityViewModels()
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,

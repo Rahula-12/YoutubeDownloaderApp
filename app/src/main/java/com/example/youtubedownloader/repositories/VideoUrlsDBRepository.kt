@@ -9,12 +9,13 @@ class VideoUrlsDBRepository @Inject constructor(private val videoUrlDao: VideoUr
 
     fun getUrls()=videoUrlDao.getUrls()
 
-    fun insertUrl(videoUrl: VideoUrls){
+    suspend fun insertUrl(videoUrl: VideoUrls){
         Log.d("title update inside fun","title=${videoUrl.title} time=${System.currentTimeMillis()}")
+        Log.d("time inside fun",System.currentTimeMillis().toString())
         videoUrlDao.insertUrl(videoUrl)
     }
 
-    fun deleteUrl(url:String) {
+    suspend fun deleteUrl(url:String) {
          videoUrlDao.deleteUrl(url)
      }
 }

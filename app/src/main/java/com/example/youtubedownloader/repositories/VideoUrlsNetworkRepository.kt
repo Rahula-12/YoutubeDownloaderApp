@@ -25,6 +25,7 @@ class VideoUrlsNetworkRepository @Inject constructor(private val queue: RequestQ
         val currUrl = "https://ytstream-download-youtube-videos.p.rapidapi.com/dl?id=${youtubeId}&rapidapi-key=1e59c5254cmsh65f87366aa4844fp138d18jsn4df36025d134"
         val jsonObjectRequest = JsonObjectRequest(
             Request.Method.GET, currUrl, null, { response ->
+               // Log.d("time inside NetworkRepo",System.currentTimeMillis().toString())
                 it.resume(response.getString("title"))
             },
             { error ->
