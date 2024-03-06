@@ -74,16 +74,19 @@ class YoutubeDownloaderViewModel @Inject constructor(
 
     fun deleteUrl() {
         // Deleting URL from the database
-        viewModelScope.launch(Dispatchers.IO) {
+        Log.d("deleteOut","$deleteUrl ${System.currentTimeMillis()}")
+        viewModelScope.launch(Dispatchers.IO){
+            Log.d("delete",deleteUrl)
             videoUrlsDBRepository.deleteUrl(deleteUrl)
         }
         resetAll()
     }
-
+//1709745122537
     fun assignUrls(url: String) {
         // Assigning download URL and delete URL and fetching thumbnail and title
         downloadUrl = url
         deleteUrl = url
+        Log.d("assign","$deleteUrl $downloadUrl ${System.currentTimeMillis()}")
         thumbUrlAndTitle()
     }
 
