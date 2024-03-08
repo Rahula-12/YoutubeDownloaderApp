@@ -49,7 +49,7 @@ class YoutubeDownloaderViewModel @Inject constructor(
         // Deleting previous URL if any and inserting the new URL into the database
         val temp = deleteUrl
         deleteUrl = url
-        deleteUrl()
+       // deleteUrl()
         deleteUrl = temp
         val sdf = SimpleDateFormat("dd/MM/yyyy")
         val date = sdf.format(Date()).toString()
