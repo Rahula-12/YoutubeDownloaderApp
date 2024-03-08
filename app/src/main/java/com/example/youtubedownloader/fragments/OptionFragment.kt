@@ -121,7 +121,7 @@ class OptionFragment : Fragment() {
     private fun Fragment.congratulationsDialog() {
         SweetAlertDialog(context, SweetAlertDialog.SUCCESS_TYPE)
             .setTitleText("Congratulations")
-            .setContentText("Video has been downloaded.")
+            .setContentText("Video downloaded successfully.")
             .show()
     }
 

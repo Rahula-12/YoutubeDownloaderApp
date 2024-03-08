@@ -9,6 +9,7 @@ import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
+import cn.pedant.SweetAlert.SweetAlertDialog
 import com.example.youtubedownloader.databinding.FragmentSearchedVideosBinding
 import com.example.youtubedownloader.recyclerView.VideoUrlAdapter
 import com.example.youtubedownloader.viewmodel.YoutubeDownloaderViewModel
@@ -34,6 +35,11 @@ class SearchedVideos : Fragment(), ItemClicked {
                 binding.message.visibility=View.INVISIBLE
             adapter.updateList(it)
         }
+        viewModel.downloadCompleted.observe(viewLifecycleOwner) { downloadCompleted ->
+            if (downloadCompleted) {
+                congratulationsDialog()
+            }
+        }
         binding.addUrl.setOnClickListener{
             findNavController().navigate(com.example.youtubedownloader.R.id.action_searchedVideos_to_dialogUrl)
         }
@@ -48,4 +54,11 @@ class SearchedVideos : Fragment(), ItemClicked {
 }
 interface ItemClicked{
     fun onItemClicked(url:String)
+}
+
+private fun Fragment.congratulationsDialog() {
+    SweetAlertDialog(context, SweetAlertDialog.SUCCESS_TYPE)
+        .setTitleText("Congratulations")
+        .setContentText("Video downloaded successfully.")
+        .show()
 }
