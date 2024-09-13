@@ -1,4 +1,4 @@
-package com.example.youtubedownloader.database
+package com.example.youtubedownloader
 
 import android.app.Application
 import dagger.hilt.android.HiltAndroidApp

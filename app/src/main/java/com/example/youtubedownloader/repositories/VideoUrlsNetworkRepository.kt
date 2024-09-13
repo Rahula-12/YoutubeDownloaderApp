@@ -9,9 +9,13 @@ import android.media.MediaScannerConnection
 import android.net.Uri
 import android.os.Environment
 import android.util.Log
+import com.android.volley.Header
 import com.android.volley.Request
 import com.android.volley.RequestQueue
+import com.android.volley.Response
 import com.android.volley.toolbox.JsonObjectRequest
+import com.android.volley.toolbox.JsonRequest
+import com.example.youtubedownloader.BuildConfig
 import com.example.youtubedownloader.data.VideoItem
 import dagger.hilt.android.qualifiers.ApplicationContext
 import java.io.File
@@ -19,101 +23,97 @@ import javax.inject.Inject
 import kotlin.coroutines.resume
 import kotlin.coroutines.suspendCoroutine
 
-class VideoUrlsNetworkRepository @Inject constructor(private val queue: RequestQueue,@ApplicationContext private val context: Context) {
-
+class VideoUrlsNetworkRepository @Inject constructor(private val queue: RequestQueue) {
+    lateinit var outputUrls:MutableList<VideoItem>
     suspend fun insertUrlRequestIntoQueue(youtubeId:String?)= suspendCoroutine<String> {
-        val currUrl = "https://ytstream-download-youtube-videos.p.rapidapi.com/dl?id=${youtubeId}&rapidapi-key=1e59c5254cmsh65f87366aa4844fp138d18jsn4df36025d134"
-        val jsonObjectRequest = JsonObjectRequest(
-            Request.Method.GET, currUrl, null, { response ->
+        val currUrl = "https://ytstream-download-youtube-videos.p.rapidapi.com/dl?id=${youtubeId}"
+        val jsonObjectRequest = object :JsonObjectRequest(
+            Method.GET, currUrl, null, { response ->
                // Log.d("time inside NetworkRepo",System.currentTimeMillis().toString())
                 it.resume(response.getString("title"))
             },
             { error ->
                 Log.d("insertion error", error.toString())
             }
-        )
+        ){
+            override fun getHeaders(): MutableMap<String, String> {
+                val headers:MutableMap<String,String> = mutableMapOf(
+                    "x-rapidapi-key" to BuildConfig.API_KEY,
+                    "x-rapidapi-host" to "ytstream-download-youtube-videos.p.rapidapi.com"
+                )
+                return headers
+            }
+        }
         queue.add(jsonObjectRequest)
     }
 
     fun insertThumbUrlAndTitleRequestIntoQueue(youtubeId:String?,updateThumbAndTitle:(String,String)->Unit={
-        s1,s2->
+        _,_->
     }){
+        outputUrls= mutableListOf()
         val currUrl =
-            "https://ytstream-download-youtube-videos.p.rapidapi.com/dl?id=${youtubeId}&rapidapi-key=1e59c5254cmsh65f87366aa4844fp138d18jsn4df36025d134"
-        val thumbAndTitle= mutableListOf<String>()
-        val jsonObjectRequest = JsonObjectRequest(
-            Request.Method.GET, currUrl, null,
+            "https://ytstream-download-youtube-videos.p.rapidapi.com/dl?id=${youtubeId}"
+        mutableListOf<String>()
+        val jsonObjectRequest = object :JsonObjectRequest(
+            Method.GET, currUrl, null,
             { response ->
+                try {
+                    outputUrls.add(VideoItem(response.getJSONArray("formats").getJSONObject(0).getString("url")))
+                }
+                catch (_:Exception) {
+
+                }
                 updateThumbAndTitle(
-                response.getString("thumb"),
+                response.getJSONArray("thumbnail").getJSONObject(0).getString("url"),
                 response.getString("title")
                 )
             },
             { error ->
                 Log.d("problem", error.toString())
             }
-        )
+        ){
+            override fun getHeaders(): MutableMap<String, String> {
+                val headers:MutableMap<String,String> = mutableMapOf(
+                    "x-rapidapi-key" to BuildConfig.API_KEY,
+                    "x-rapidapi-host" to "ytstream-download-youtube-videos.p.rapidapi.com"
+                )
+                return headers
+            }
+        }
         queue.add(jsonObjectRequest)
     }
 
     suspend fun outputVideosRequestIntoQueue(
-        pos:Int,
-        youtubeId: String?,
-        updateDownloadId:(Long)->Unit={},
-        updateDownloadLiveData:(Long?)->Unit={}
+        youtubeId: String?
     )= suspendCoroutine<List<VideoItem>> {
-        val outputUrls:MutableList<VideoItem> = mutableListOf()
+        if(::outputUrls.isInitialized)  outputUrls
         val currUrl =
-            "https://ytstream-download-youtube-videos.p.rapidapi.com/dl?id=${youtubeId}&rapidapi-key=1e59c5254cmsh65f87366aa4844fp138d18jsn4df36025d134"
-        val jsonObjectRequest = JsonObjectRequest(
-            Request.Method.GET, currUrl, null,
+            "https://ytstream-download-youtube-videos.p.rapidapi.com/dl?id=${youtubeId}"
+        val jsonObjectRequest = object :JsonObjectRequest(
+            Method.GET, currUrl, null,
             { response ->
-                val obj = response.getJSONObject("link")
-                outputUrls.add(VideoItem(obj.getJSONArray("18").getString(0)))
-                outputUrls.add(VideoItem(obj.getJSONArray("22").getString(0)))
-                it.resume(outputUrls)
-                val DIRECTORY = "/YoutubeVideos/"
-                val DIRECTORY_FOLDER =
-                    File("${Environment.getExternalStorageDirectory()}/Download/${DIRECTORY}")
-                if (!DIRECTORY_FOLDER.exists()) {
-                    DIRECTORY_FOLDER.mkdirs()
+//                val obj = response.getJSONObject("link")
+                try {
+                    outputUrls.add(VideoItem(response.getJSONArray("formats").getJSONObject(0).getString("url")))
+//                outputUrls.add(VideoItem("https://rr3---sn-qxaelnes.googlevideo.com/videoplayback?expire=1726091938&ei=Qr7hZsOaH6_Rp-oPysa9yAw&ip=196.44.123.96&id=o-AAAMcSXUfay0fOThPrJHD-Vm_MKnb8w69zEXosLCACf6&itag=18&source=youtube&requiressl=yes&xpc=EgVo2aDSNQ%3D%3D&bui=AQmm2eyatLDOP83_DG49UQS57PWrbXtDSWI4mrh6MIRfkteUAH03CKSMmx2H52KbVbfwEZfQzwSqql4T&spc=Mv1m9nmms_XrEJr8EyYpheLFzlbag8hkiS0z1y5hgWesECCWp-a2&vprv=1&svpuc=1&mime=video%2Fmp4&ns=_xRIRwAT5MLpWmnlCgCFJyAQ&rqh=1&cnr=14&ratebypass=yes&dur=180.024&lmt=1714804883028793&c=WEB&sefc=1&txp=4538434&n=O1GvNkpT5ga4Gg&sparams=expire%2Cei%2Cip%2Cid%2Citag%2Csource%2Crequiressl%2Cxpc%2Cbui%2Cspc%2Cvprv%2Csvpuc%2Cmime%2Cns%2Crqh%2Ccnr%2Cratebypass%2Cdur%2Clmt&sig=AJfQdSswRgIhAIeegcyCzhJ07jTTGChaE_6GTAaIPSH2YcLOvkATuqo4AiEArHYuZCN12YDS8qxLR355zn54MH-ukKSb_QG3LYPF2BQ%3D&redirect_counter=1&rm=sn-4g5ek67l&rrc=104&fexp=24350517,24350556,24350561&req_id=1fabe2fd383ca3ee&cms_redirect=yes&ipbypass=yes&mh=S8&mip=2401:4900:8394:8cf2:14ef:f8f9:20f3:9da9&mm=31&mn=sn-qxaelnes&ms=au&mt=1726075770&mv=m&mvi=3&pl=44&lsparams=ipbypass,mh,mip,mm,mn,ms,mv,mvi,pl&lsig=ABPmVW0wRgIhAKBAX-S_SjOherB-zADGs7QfZp71L_EHmcgKY68DYrKXAiEA_dWRi7dMGvquF-4TFW8e2hSo3AZT5TsSh7fv8G93rmo%3D"))
+                    it.resume(outputUrls)
                 }
-                val request = DownloadManager.Request(Uri.parse(outputUrls[pos].url))
-                    .setTitle("YoutubeVideo_" + System.currentTimeMillis().toString() + ".mp4")
-                    .setDescription("Downloading Video")
-                    .setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE)
-                    .setAllowedOverMetered(true)
-                    .setAllowedNetworkTypes(DownloadManager.Request.NETWORK_WIFI or DownloadManager.Request.NETWORK_MOBILE)
-                    .setDestinationInExternalPublicDir(
-                        Environment.DIRECTORY_DOWNLOADS,
-                        DIRECTORY + "YoutubeVideo_" + System.currentTimeMillis().toString() + ".mp4"
-                    )
-                val dm: DownloadManager = context.getSystemService(Context.DOWNLOAD_SERVICE) as DownloadManager
-                updateDownloadId(dm.enqueue(request))
-                MediaScannerConnection.scanFile(
-                    context,
-                    arrayOf(
-                        File(
-                            Environment.DIRECTORY_DOWNLOADS + "/" + DIRECTORY + "YoutubeVideo_" + System.currentTimeMillis()
-                                .toString() + ".mp4"
-                        ).absolutePath
-                    ),
-                    null
-                )
-                { _, _ ->
+                catch (_:Exception) {
+
                 }
-                val br = object : BroadcastReceiver() {
-                    override fun onReceive(p0: Context?, p1: Intent?) {
-                        val id = p1?.getLongExtra(DownloadManager.EXTRA_DOWNLOAD_ID, -1)
-                        updateDownloadLiveData(id)
-                    }
-                }
-                context.registerReceiver(br, (IntentFilter(DownloadManager.ACTION_DOWNLOAD_COMPLETE)))
             },
             { error ->
                 Log.d("problem", error.toString())
             }
-        )
+        ){
+            override fun getHeaders(): MutableMap<String, String> {
+                val headers:MutableMap<String,String> = mutableMapOf(
+                    "x-rapidapi-key" to BuildConfig.API_KEY,
+                    "x-rapidapi-host" to "ytstream-download-youtube-videos.p.rapidapi.com"
+                )
+                return headers
+            }
+        }
         queue.add(jsonObjectRequest)
     }
 
