@@ -23,14 +23,7 @@ class MainActivity : AppCompatActivity() {
             }
 
             override fun onFinish() {
-                val navHostFragment = supportFragmentManager
-                    .findFragmentById(R.id.navHostFragment) as NavHostFragment
-                val inflater = navHostFragment.navController.navInflater
-                val graph = inflater.inflate(R.navigation.nav_graph)
-
-
-                graph.startDestination = R.id.searchedVideos
-                navController.graph = graph
+                navController.navigate(R.id.action_homeScreen_to_searchedVideos)
             }
 
         }.start()

@@ -10,6 +10,7 @@ import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import cn.pedant.SweetAlert.SweetAlertDialog
+import com.example.youtubedownloader.R
 import com.example.youtubedownloader.databinding.FragmentSearchedVideosBinding
 import com.example.youtubedownloader.recyclerView.VideoUrlAdapter
 import com.example.youtubedownloader.viewmodel.YoutubeDownloaderViewModel
@@ -35,13 +36,8 @@ class SearchedVideos : Fragment(), ItemClicked {
                 binding.message.visibility=View.INVISIBLE
             adapter.updateList(it)
         }
-        viewModel.downloadCompleted.observe(viewLifecycleOwner) { downloadCompleted ->
-            if (downloadCompleted) {
-                congratulationsDialog()
-            }
-        }
         binding.addUrl.setOnClickListener{
-            findNavController().navigate(com.example.youtubedownloader.R.id.action_searchedVideos_to_dialogUrl)
+            findNavController().navigate(R.id.action_searchedVideos_to_dialogUrl)
         }
         viewModel.resetAll()
         return binding.root
@@ -49,16 +45,11 @@ class SearchedVideos : Fragment(), ItemClicked {
 
     override fun onItemClicked(url:String) {
         viewModel.assignUrls(url)
-        findNavController().navigate(com.example.youtubedownloader.R.id.action_searchedVideos_to_optionFragment)
+        val bundle=Bundle()
+        bundle.putString("url",url)
+        findNavController().navigate(R.id.action_searchedVideos_to_optionFragment,bundle)
     }
 }
 interface ItemClicked{
     fun onItemClicked(url:String)
-}
-
-private fun Fragment.congratulationsDialog() {
-    SweetAlertDialog(context, SweetAlertDialog.SUCCESS_TYPE)
-        .setTitleText("Congratulations")
-        .setContentText("Video downloaded successfully.")
-        .show()
 }
