@@ -6,10 +6,8 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
-import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
-import cn.pedant.SweetAlert.SweetAlertDialog
 import com.example.youtubedownloader.R
 import com.example.youtubedownloader.databinding.FragmentSearchedVideosBinding
 import com.example.youtubedownloader.recyclerView.VideoUrlAdapter
@@ -18,7 +16,7 @@ import dagger.hilt.android.AndroidEntryPoint
 
 
 @AndroidEntryPoint
-class SearchedVideos : Fragment(), ItemClicked {
+class SearchedVideos : Fragment() {
     private lateinit var binding:FragmentSearchedVideosBinding
     private val viewModel:YoutubeDownloaderViewModel by activityViewModels()
     override fun onCreateView(
@@ -26,7 +24,12 @@ class SearchedVideos : Fragment(), ItemClicked {
         savedInstanceState: Bundle?
     ): View {
         binding=FragmentSearchedVideosBinding.inflate(inflater,container,false)
-        val adapter=VideoUrlAdapter(this)
+        val adapter=VideoUrlAdapter(onItemClicked={url->
+            viewModel.assignUrls(url)
+            val bundle=Bundle()
+            bundle.putString("url",url)
+            findNavController().navigate(R.id.action_searchedVideos_to_optionFragment,bundle)
+        })
         binding.recyclerView.adapter=adapter
         binding.recyclerView.layoutManager= LinearLayoutManager(context)
         viewModel.urls.observe(viewLifecycleOwner){
@@ -34,7 +37,7 @@ class SearchedVideos : Fragment(), ItemClicked {
                 binding.message.visibility=View.VISIBLE
             else
                 binding.message.visibility=View.INVISIBLE
-            adapter.updateList(it)
+            adapter.submitList(it)
         }
         binding.addUrl.setOnClickListener{
             findNavController().navigate(R.id.action_searchedVideos_to_dialogUrl)
@@ -42,14 +45,4 @@ class SearchedVideos : Fragment(), ItemClicked {
         viewModel.resetAll()
         return binding.root
     }
-
-    override fun onItemClicked(url:String) {
-        viewModel.assignUrls(url)
-        val bundle=Bundle()
-        bundle.putString("url",url)
-        findNavController().navigate(R.id.action_searchedVideos_to_optionFragment,bundle)
-    }
-}
-interface ItemClicked{
-    fun onItemClicked(url:String)
 }
