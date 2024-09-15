@@ -1,7 +1,7 @@
 name: first_workflow
 on:
     push:
-      branches-ignore:
+      branches:
         - main
 jobs:
   first_job:
