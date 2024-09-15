@@ -16,4 +16,5 @@
     <string name="no_url_saved_please_add_a_url_to_save">Add a video URL to download video!</string>
     <string name="add_url">Add url</string>
     <string name="video_title">Video title</string>
+    <string name="video_url">Video URL</string>
 </resources>

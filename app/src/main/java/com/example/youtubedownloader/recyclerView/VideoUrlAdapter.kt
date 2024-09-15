@@ -3,43 +3,68 @@ package com.example.youtubedownloader.recyclerView
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ProgressBar
 import android.widget.TextView
+import androidx.core.view.isVisible
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.example.youtubedownloader.R
 import com.example.youtubedownloader.database.VideoUrls
 
-class VideoUrlAdapter(private val onItemClicked:(String)->Unit):ListAdapter<VideoUrls,VideoUrlAdapter.VideoUrlViewHolder>(VideoDiffCallback()){
+class VideoUrlAdapter(
+    private val onItemClicked:(String)->Unit,
+    var urlInserted:Boolean
+):ListAdapter<VideoUrls,VideoUrlAdapter.VideoUrlViewHolder>(VideoDiffCallback(),){
     //private val urls:MutableList<VideoUrls> = mutableListOf()
     class VideoUrlViewHolder(view: View):RecyclerView.ViewHolder(view){
         val videoUrl: TextView =view.findViewById(R.id.videoUrl)
         val time: TextView =view.findViewById(R.id.time)
+        val divider:View=view.findViewById(R.id.divider)
+        val progressBar: ProgressBar =view.findViewById<ProgressBar>(R.id.progress_circular)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): VideoUrlViewHolder {
         val layout=LayoutInflater.from(parent.context).inflate(R.layout.list_item,parent,false)
         val videoUrlViewHolder=VideoUrlViewHolder(layout)
-        layout.setOnClickListener{
-            onItemClicked(getItem(0).videoUrl)
-        }
         return videoUrlViewHolder
     }
 
     override fun onBindViewHolder(holder: VideoUrlViewHolder, position: Int) {
-        holder.videoUrl.text=getItem(0).title
-        holder.time.text=getItem(0).time
+        if(position==0 && getItem(position).title=="") {
+            if(urlInserted) {
+                holder.videoUrl.isVisible=true
+                holder.divider.isVisible=true
+                holder.time.isVisible=true
+                holder.progressBar.isVisible=false
+            }
+            if(!urlInserted) {
+                holder.videoUrl.isVisible=false
+                holder.divider.isVisible=false
+                holder.time.isVisible=false
+                holder.progressBar.isVisible=true
+            }
+        }
+        holder.videoUrl.text = getItem(position).title
+        holder.time.text = getItem(position).time
+        holder.itemView.setOnClickListener {
+            try {
+                onItemClicked(getItem(position).videoUrl)
+            } catch (_: Exception) {
+
+            }
+        }
     }
 }
 
-class VideoDiffCallback():DiffUtil.ItemCallback<VideoUrls>(){
+class VideoDiffCallback:DiffUtil.ItemCallback<VideoUrls>(){
 
     override fun areItemsTheSame(oldItem: VideoUrls, newItem: VideoUrls): Boolean {
         return oldItem.id==newItem.id
     }
 
     override fun areContentsTheSame(oldItem: VideoUrls, newItem: VideoUrls): Boolean {
-        return oldItem==newItem
+        return oldItem.title==newItem.title
     }
 
 }

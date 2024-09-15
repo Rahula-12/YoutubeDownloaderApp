@@ -1,7 +1,8 @@
-package com.example.youtubedownloader.fragments
+package com.example.youtubedownloader.screens
 import android.Manifest
-import android.app.AlertDialog
 import android.app.DownloadManager
+import android.app.NotificationManager
+import android.app.PendingIntent
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
@@ -18,17 +19,20 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.annotation.RequiresApi
+import androidx.core.app.NotificationCompat
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
 import cn.pedant.SweetAlert.SweetAlertDialog
 import com.bumptech.glide.Glide
+import com.example.youtubedownloader.MainActivity
 import com.example.youtubedownloader.R
 import com.example.youtubedownloader.databinding.FragmentOptionBinding
 import com.example.youtubedownloader.viewmodel.YoutubeDownloaderViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import java.io.File
+import kotlin.random.Random
 
 private const val STORAGE_REQUEST_CODE = 1
 @AndroidEntryPoint
@@ -71,7 +75,7 @@ class OptionFragment : Fragment() {
         downloadNotificationReceiver=object : BroadcastReceiver() {
             override fun onReceive(context: Context?, intent: Intent?) {
                 val id =intent?.getLongExtra(DownloadManager.EXTRA_DOWNLOAD_ID, -1)
-                Log.d("DownloadId",id.toString())
+//                Log.d("DownloadId",id.toString())
                 if(id!=null && id==downloadId){
                     congratulationsDialog()
                 }
@@ -175,6 +179,7 @@ class OptionFragment : Fragment() {
     }
 
     private fun makeDownloadRequest(url:String):Long {
+        sendNotification()
         val directory = "/YoutubeVideos/"
         val directoryFolder =
             File("${Environment.getExternalStorageDirectory()}/Download/${directory}")
@@ -205,6 +210,32 @@ class OptionFragment : Fragment() {
             _,_->
         }
          return dm.enqueue(request)
+    }
+
+    private fun sendNotification() {
+        val intent=Intent(requireContext(),MainActivity::class.java)
+        val pendingIntent=PendingIntent.getActivity(
+            requireContext(),
+            1,
+            intent,
+            if(Build.VERSION.SDK_INT>=Build.VERSION_CODES.M) PendingIntent.FLAG_IMMUTABLE else 0
+        )
+        val id= Random.nextInt()
+        val notification= NotificationCompat.Builder(
+            requireContext(),"success_channel"
+        )
+            .setSmallIcon(R.drawable.download)
+            .setContentTitle("Download Started")
+            .setContentTitle("Your Video is downloading....")
+            .setContentIntent(pendingIntent)
+            .addAction(
+                2,
+                "Go to Application",
+                pendingIntent
+            )
+            .build()
+        val notificationManager=requireContext().getSystemService(NotificationManager::class.java)
+        notificationManager.notify(id,notification)
     }
 
     @RequiresApi(Build.VERSION_CODES.TIRAMISU)

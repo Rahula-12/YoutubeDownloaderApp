@@ -1,8 +1,9 @@
-package com.example.youtubedownloader.fragments
+package com.example.youtubedownloader.screens
 
 import android.content.res.Resources
 import android.graphics.Rect
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -22,8 +23,10 @@ class DialogUrl : DialogFragment() {
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         binding= FragmentDialogUrlBinding.inflate(inflater,container,false)
         dialog?.setTitle("Video Url")
+        binding.viewmodel=viewModel
         binding.submit.setOnClickListener{
             if(viewModel.isYoutubeUrl(binding.myUrl.text.toString())) {
+                Log.d("testing_insert","abc")
                 viewModel.insertUrl(binding.myUrl.text.toString())
                 findNavController().navigate(R.id.action_dialogUrl_to_searchedVideos)
             }

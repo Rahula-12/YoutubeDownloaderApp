@@ -26,6 +26,9 @@ class YoutubeDownloaderViewModel @Inject constructor(
     val urls: LiveData<List<VideoUrls>> = videoUrlsDBRepository.getUrls()
     private val outputUrls: MutableList<VideoItem> = mutableListOf()
 
+    private val _urlInserted:MutableLiveData<Boolean> = MutableLiveData<Boolean>(true)
+    val urlInserted:LiveData<Boolean> = _urlInserted
+
     private val _thumbnail = MutableLiveData<String>()
     val thumbnail: LiveData<String>
         get() = _thumbnail
@@ -41,26 +44,44 @@ class YoutubeDownloaderViewModel @Inject constructor(
 
     @SuppressLint("SimpleDateFormat")
     fun insertUrl(url: String) {
+        _urlInserted.value=false
         // Deleting previous URL if any and inserting the new URL into the database
         val sdf = SimpleDateFormat("dd/MM/yyyy")
         val date = sdf.format(Date()).toString()
         val time = Calendar.getInstance().time.toString()
         var title = ""
         viewModelScope.launch(Dispatchers.IO) {
-                title = videoUrlsNetworkRepository.insertUrlRequestIntoQueue(
-                    getYoutubeID(url)
-                )
-            withContext(Dispatchers.Main) {
-                deleteUrl(url)
-            }
             videoUrlsDBRepository.insertUrl(
                 VideoUrls(
-                    videoUrl = url,
-                    title = title,
+                    videoUrl = "",
+                    title = "",
                     date = date,
                     time = time
                 )
             )
+            title = videoUrlsNetworkRepository.insertUrlRequestIntoQueue(
+                    getYoutubeID(url)
+                )
+            withContext(Dispatchers.Main) {
+//                _urlInserted.value=true
+//                _urlInserted.value=false
+                deleteUrl(url)
+            }
+            val latestVideoUrl=videoUrlsDBRepository.getLatestUrl()
+            latestVideoUrl.videoUrl=url
+            latestVideoUrl.title=title
+            videoUrlsDBRepository.updateLatestUrl(latestVideoUrl)
+//            videoUrlsDBRepository.insertUrl(
+//                VideoUrls(
+//                    videoUrl = url,
+//                    title = title,
+//                    date = date,
+//                    time = time
+//                )
+//            )
+            withContext(Dispatchers.Main) {
+                _urlInserted.value=true
+            }
         }
     }
 
