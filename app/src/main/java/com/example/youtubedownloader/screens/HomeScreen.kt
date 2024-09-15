@@ -1,13 +1,10 @@
-package com.example.youtubedownloader.fragments
+package com.example.youtubedownloader.screens
 
 import android.os.Bundle
-import android.os.CountDownTimer
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.fragment.app.FragmentTransaction
-import androidx.navigation.fragment.findNavController
 import com.example.youtubedownloader.R
 
 class HomeScreen : Fragment() {

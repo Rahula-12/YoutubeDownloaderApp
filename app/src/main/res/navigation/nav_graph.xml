@@ -3,24 +3,24 @@
             xmlns:app="http://schemas.android.com/apk/res-auto"
             xmlns:tools="http://schemas.android.com/tools" android:id="@+id/navgraph"
             app:startDestination="@id/homeScreen">
-    <fragment android:id="@+id/searchedVideos" android:name="com.example.youtubedownloader.fragments.SearchedVideos"
+    <fragment android:id="@+id/searchedVideos" android:name="com.example.youtubedownloader.screens.SearchedVideos"
               android:label="SearchedVideos">
         <action android:id="@+id/action_searchedVideos_to_optionFragment" app:destination="@id/optionFragment"
                 app:enterAnim="@anim/slidein" app:exitAnim="@anim/fadeout" app:popEnterAnim="@anim/fadein"
                 app:popExitAnim="@anim/slideout"/>
         <action android:id="@+id/action_searchedVideos_to_dialogUrl" app:destination="@id/dialogUrl"/>
     </fragment>
-    <fragment android:id="@+id/optionFragment" android:name="com.example.youtubedownloader.fragments.OptionFragment"
+    <fragment android:id="@+id/optionFragment" android:name="com.example.youtubedownloader.screens.OptionFragment"
               android:label="Options" tools:layout="@layout/fragment_option">
         <action android:id="@+id/action_optionFragment_to_searchedVideos" app:destination="@id/searchedVideos"
                 app:popUpTo="@id/searchedVideos" app:popUpToInclusive="true"
                 app:enterAnim="@anim/fadein" app:exitAnim="@anim/slideout"/>
     </fragment>
-    <dialog android:id="@+id/dialogUrl" android:name="com.example.youtubedownloader.fragments.DialogUrl"
+    <dialog android:id="@+id/dialogUrl" android:name="com.example.youtubedownloader.screens.DialogUrl"
             android:label="DialogUrl">
         <action android:id="@+id/action_dialogUrl_to_searchedVideos" app:destination="@id/searchedVideos"/>
     </dialog>
-    <fragment android:id="@+id/homeScreen" android:name="com.example.youtubedownloader.fragments.HomeScreen"
+    <fragment android:id="@+id/homeScreen" android:name="com.example.youtubedownloader.screens.HomeScreen"
               android:label="HomeScreen" tools:layout="@layout/fragment_home_screen">
         <action android:id="@+id/action_homeScreen_to_searchedVideos" app:destination="@id/searchedVideos"
                 app:enterAnim="@anim/slidein" app:exitAnim="@anim/fadeout" app:popUpTo="@id/homeScreen"

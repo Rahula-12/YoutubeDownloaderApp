@@ -10,14 +10,14 @@ data class VideoUrls(
     val id:Int=0,
 
     @ColumnInfo(name = "VideoUrl")
-    val videoUrl:String,
+    var videoUrl:String,
 
     @ColumnInfo(name="VideoTitle")
-    val title:String,
+    var title:String,
 
     @ColumnInfo(name = "Date")
-    val date: String,
+    var date: String,
 
     @ColumnInfo(name = "Time")
-    val time: String
+    var time: String
 )

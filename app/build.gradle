@@ -3,20 +3,25 @@ plugins {
     id 'kotlin-android'
     id 'kotlin-kapt'
     id 'androidx.navigation.safeargs.kotlin'
-    id 'dagger.hilt.android.plugin'
+    id "com.google.dagger.hilt.android"
+//    id "com.google.devtools.ksp"
 }
 
 android {
-    compileSdk 33
+    compileSdk 34
     buildToolsVersion "30.0.2"
     defaultConfig {
         applicationId "com.example.youtubedownloader"
-        minSdk 21
-        targetSdk 33
+        minSdk 26
+        targetSdk 31
         versionCode 1
         versionName "1.0"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+        def properties= new Properties()
+        properties.load(project.rootProject.file("local.properties").newDataInputStream())
+        def apiKey=properties.getProperty("API_KEY")
+        buildConfigField "String", "API_KEY", "\"${apiKey}\""
     }
 
     buildTypes {
@@ -38,8 +43,9 @@ android {
 }
 
 dependencies {
-    implementation 'androidx.core:core-ktx:1.6.0'
-    implementation 'androidx.appcompat:appcompat:1.3.1'
+
+    implementation 'androidx.core:core-ktx:1.7.0'
+    implementation 'androidx.appcompat:appcompat:1.4.0'
     implementation 'com.google.android.material:material:1.4.0'
     implementation 'androidx.constraintlayout:constraintlayout:2.1.2'
     implementation 'androidx.legacy:legacy-support-v4:1.0.0'
@@ -61,8 +67,29 @@ dependencies {
     implementation 'com.github.f0ris.sweetalert:library:1.5.1'
     implementation 'com.github.bumptech.glide:glide:4.12.0'
     annotationProcessor 'com.github.bumptech.glide:compiler:4.12.0'
+    // For Robolectric tests.
+    testImplementation("com.google.dagger:hilt-android-testing:2.44")
+    // ...with Kotlin.
+    kaptTest("com.google.dagger:hilt-android-compiler:2.44")
+    // ...with Java.
+    testAnnotationProcessor("com.google.dagger:hilt-android-compiler:2.44")
 
-    //dagger dependencies
-    implementation 'com.google.dagger:hilt-android:2.44'
-    kapt "com.google.dagger:hilt-android-compiler:$hilt_version"
+
+    // For instrumented tests.
+    androidTestImplementation("com.google.dagger:hilt-android-testing:2.44")
+    // ...with Kotlin.
+    kaptAndroidTest("com.google.dagger:hilt-android-compiler:2.44")
+    // ...with Java.
+    androidTestAnnotationProcessor("com.google.dagger:hilt-android-compiler:2.44")
+
+    // For local unit tests
+    testImplementation("com.google.dagger:hilt-android-testing:2.44") // Use the latest version
+    kaptTest("com.google.dagger:hilt-android-compiler:2.44")
+
+    // For instrumented tests
+    androidTestImplementation("com.google.dagger:hilt-android-testing:2.44")
+    kaptAndroidTest("com.google.dagger:hilt-android-compiler:2.44")
+
+    implementation("com.google.dagger:hilt-android:2.44") // Use the latest version
+    kapt("com.google.dagger:hilt-android-compiler:2.44")
 }
