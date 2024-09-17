@@ -21,6 +21,9 @@ interface VideoUrlDao {
 
     @Update
     suspend fun updateLatestUrl(videoUrls: VideoUrls)
+
+    @Query("Delete from VideoUrls where id=:id")
+    suspend fun deleteUrlById(id:Int)
 }
 
 // https://youtu.be/aWWJWfivRp0?si=qe8kWF4h9tXE6l0C

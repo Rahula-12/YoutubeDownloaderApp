@@ -5,6 +5,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ProgressBar
 import android.widget.TextView
+import androidx.appcompat.app.AlertDialog
 import androidx.core.view.isVisible
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
@@ -14,6 +15,7 @@ import com.example.youtubedownloader.database.VideoUrls
 
 class VideoUrlAdapter(
     private val onItemClicked:(String)->Unit,
+    private val onItemLongClicked:(Int)->Unit,
     var urlInserted:Boolean
 ):ListAdapter<VideoUrls,VideoUrlAdapter.VideoUrlViewHolder>(VideoDiffCallback(),){
     //private val urls:MutableList<VideoUrls> = mutableListOf()
@@ -53,6 +55,17 @@ class VideoUrlAdapter(
             } catch (_: Exception) {
 
             }
+        }
+        holder.itemView.setOnLongClickListener{
+            AlertDialog.Builder(holder.itemView.context)
+                .setMessage("Do you want to delete this Url?")
+                .setPositiveButton("Ok"){_,_->
+                    onItemLongClicked(getItem(position).id)
+                }
+                .setNeutralButton("Cancel"){_,_->
+
+                }.show()
+            true
         }
     }
 }

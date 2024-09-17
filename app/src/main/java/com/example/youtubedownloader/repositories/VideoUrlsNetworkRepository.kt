@@ -26,14 +26,21 @@ import kotlin.coroutines.suspendCoroutine
 class VideoUrlsNetworkRepository @Inject constructor(private val queue: RequestQueue) {
     lateinit var outputUrls:MutableList<VideoItem>
     suspend fun insertUrlRequestIntoQueue(youtubeId:String?)= suspendCoroutine<String> {
+        Log.d("youtubeId",youtubeId.toString())
         val currUrl = "https://ytstream-download-youtube-videos.p.rapidapi.com/dl?id=${youtubeId}"
         val jsonObjectRequest = object :JsonObjectRequest(
             Method.GET, currUrl, null, { response ->
                // Log.d("time inside NetworkRepo",System.currentTimeMillis().toString())
-                it.resume(response.getString("title"))
+                Log.d("Response",response.toString())
+                try {
+                    it.resume(response.getString("title"))
+                }
+                catch (e:Exception) {
+                    it.resume(e.toString())
+                }
             },
             { error ->
-                Log.d("insertion error", error.toString())
+                it.resume(error.toString())
             }
         ){
             override fun getHeaders(): MutableMap<String, String> {
@@ -50,6 +57,7 @@ class VideoUrlsNetworkRepository @Inject constructor(private val queue: RequestQ
     fun insertThumbUrlAndTitleRequestIntoQueue(youtubeId:String?,updateThumbAndTitle:(String,String)->Unit={
         _,_->
     }){
+        Log.d("youtubeId",youtubeId.toString())
         outputUrls= mutableListOf()
         val currUrl =
             "https://ytstream-download-youtube-videos.p.rapidapi.com/dl?id=${youtubeId}"
@@ -63,10 +71,15 @@ class VideoUrlsNetworkRepository @Inject constructor(private val queue: RequestQ
                 catch (_:Exception) {
 
                 }
-                updateThumbAndTitle(
-                response.getJSONArray("thumbnail").getJSONObject(0).getString("url"),
-                response.getString("title")
-                )
+                try{
+                    updateThumbAndTitle(
+                        response.getJSONArray("thumbnail").getJSONObject(0).getString("url"),
+                        response.getString("title")
+                    )
+                }
+                catch (_:Exception) {
+
+                }
             },
             { error ->
                 Log.d("problem", error.toString())
@@ -89,6 +102,7 @@ class VideoUrlsNetworkRepository @Inject constructor(private val queue: RequestQ
         if(::outputUrls.isInitialized)  outputUrls
         val currUrl =
             "https://ytstream-download-youtube-videos.p.rapidapi.com/dl?id=${youtubeId}"
+        Log.d("youtubeId",youtubeId.toString())
         val jsonObjectRequest = object :JsonObjectRequest(
             Method.GET, currUrl, null,
             { response ->

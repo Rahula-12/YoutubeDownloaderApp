@@ -22,6 +22,11 @@ class DialogUrl : DialogFragment() {
     private val viewModel:YoutubeDownloaderViewModel by activityViewModels()
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         binding= FragmentDialogUrlBinding.inflate(inflater,container,false)
+        arguments?.let {
+            if(it.containsKey("videoUrl")) {
+                binding.myUrl.setText(it.getString("videoUrl"))
+            }
+        }
         dialog?.setTitle("Video Url")
         binding.viewmodel=viewModel
         binding.submit.setOnClickListener{

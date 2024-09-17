@@ -1,7 +1,9 @@
 package com.example.youtubedownloader
 
+import android.content.Intent
 import android.os.Bundle
 import android.os.CountDownTimer
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.navigation.NavController
 import androidx.navigation.fragment.NavHostFragment
@@ -23,10 +25,29 @@ class MainActivity : AppCompatActivity() {
             }
 
             override fun onFinish() {
-                navController.navigate(R.id.action_homeScreen_to_searchedVideos)
+//                val navHostFragment = supportFragmentManager
+//                    .findFragmentById(R.id.navHostFragment) as NavHostFragment
+                try {
+                    navController.navigate(R.id.action_homeScreen_to_searchedVideos)
+                }
+                catch (_:Exception) {
+
+                }
+
             }
 
         }.start()
+    }
+
+    override fun onStart() {
+        super.onStart()
+        if(intent.type=="text/plain") {
+            val videoUrl=intent.getStringExtra(Intent.EXTRA_TEXT)
+//            Toast.makeText(this,"Got $videoUrl",Toast.LENGTH_SHORT).show()
+            val bundle=Bundle()
+            bundle.putString("videoUrl",videoUrl)
+            navController.navigate(R.id.action_homeScreen_to_searchedVideos,bundle)
+        }
     }
 
     override fun onPause() {

@@ -26,12 +26,21 @@ class SearchedVideos : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
+        arguments?.let {
+            if(it.containsKey("videoUrl")) {
+                val bundle=Bundle()
+                bundle.putString("videoUrl",it.getString("videoUrl"))
+                findNavController().navigate(R.id.action_searchedVideos_to_dialogUrl,bundle)
+            }
+        }
         binding=FragmentSearchedVideosBinding.inflate(inflater,container,false)
         val adapter=VideoUrlAdapter(onItemClicked={url->
             viewModel.assignUrls(url)
             val bundle=Bundle()
             bundle.putString("url",url)
             findNavController().navigate(R.id.action_searchedVideos_to_optionFragment,bundle)
+        },{id->
+           viewModel.deleteUrlById(id)
         },false)
         viewModel.urlInserted.observe(viewLifecycleOwner){
             adapter.urlInserted=it

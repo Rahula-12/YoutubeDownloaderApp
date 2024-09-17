@@ -134,31 +134,26 @@ class YoutubeDownloaderViewModel @Inject constructor(
         }
     }
 
-    private fun getYoutubeID(youtubeUrl: String): String? {
+     fun deleteUrlById(id:Int) {
+         viewModelScope.launch {
+             videoUrlsDBRepository.deleteUrlById(id)
+         }
+     }
+
+    private fun getYoutubeID(youtubeUrl: String): String {
         // Extracting YouTube video ID from the URL
-        if (TextUtils.isEmpty(youtubeUrl)) {
-            return ""
-        }
-        var  video_id: String? = ""
-        val expression =
-            "^.*((youtu.be" + "\\/)" + "|(v\\/)|(\\/u\\/w\\/)|(embed\\/)|(watch\\?))\\??v?=?([^#\\&\\?]*).*" // var regExp = /^.*((youtu.be\/)|(v\/)|(\/u\/\w\/)|(embed\/)|(watch\?))\??v?=?([^#\&\?]*).*/;
-        val input: CharSequence = youtubeUrl
-        val pattern = Pattern.compile(expression, Pattern.CASE_INSENSITIVE)
-        val matcher = pattern.matcher(input)
-        if (matcher.matches()) {
-            val groupIndex1 = matcher.group(7)
-            if (groupIndex1 != null && groupIndex1.length == 11) video_id = groupIndex1
-        }
-        if (TextUtils.isEmpty(video_id)) {
-            if (youtubeUrl.contains("youtu.be/")) {
-                val spl = youtubeUrl.split("youtu.be/".toRegex()).toTypedArray()[1]
-                video_id = if (spl.contains("\\?")) {
-                    spl.split("\\?".toRegex()).toTypedArray()[0]
-                } else {
-                    spl
-                }
+
+        val patterns = arrayOf("^https?://(?:www\\.)?youtube\\.com/watch\\?v=([^&]+)",
+            "^https?://(?:www\\.)?youtube\\.com/embed/([^/?]+)",
+            "^https?://(?:www\\.)?youtu\\.be/([^/?]+)"
+        )
+
+        for (pattern in patterns) {
+            val matcher = Regex(pattern).find(youtubeUrl)
+            if (matcher != null) {
+                return matcher.groupValues[1]
             }
         }
-        return video_id
+        return ""
     }
 }

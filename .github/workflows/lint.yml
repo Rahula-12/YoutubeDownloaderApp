@@ -1,0 +1,25 @@
+name: performing lint
+on:
+  push:
+      branches:
+        - main
+jobs:
+  lint:
+    env:
+      API_KEY: ${{ secrets.API_KEY }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: installing dependencies
+        uses: actions/checkout@v4
+      - name: Touch local properties
+        run: touch local.properties
+      - name: Add Api Key
+        run: echo "API_KEY=$API_KEY" >> local.properties
+      - name: running lint
+        run: ./gradlew lint
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v3
+        with:
+           name: all reports
+           path: app/build/reports/lint-results-debug.html
+

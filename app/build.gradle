@@ -13,11 +13,11 @@ android {
     defaultConfig {
         applicationId "com.example.youtubedownloader"
         minSdk 26
-        targetSdk 31
+        targetSdk 33
         versionCode 1
         versionName "1.0"
 
-        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+        testInstrumentationRunner "com.example.youtubedownloader.customrunner.CustomRunner"
         def properties= new Properties()
         properties.load(project.rootProject.file("local.properties").newDataInputStream())
         def apiKey=properties.getProperty("API_KEY")
@@ -67,18 +67,11 @@ dependencies {
     implementation 'com.github.f0ris.sweetalert:library:1.5.1'
     implementation 'com.github.bumptech.glide:glide:4.12.0'
     annotationProcessor 'com.github.bumptech.glide:compiler:4.12.0'
-    // For Robolectric tests.
-    testImplementation("com.google.dagger:hilt-android-testing:2.44")
-    // ...with Kotlin.
-    kaptTest("com.google.dagger:hilt-android-compiler:2.44")
     // ...with Java.
     testAnnotationProcessor("com.google.dagger:hilt-android-compiler:2.44")
 
-
-    // For instrumented tests.
-    androidTestImplementation("com.google.dagger:hilt-android-testing:2.44")
-    // ...with Kotlin.
-    kaptAndroidTest("com.google.dagger:hilt-android-compiler:2.44")
+    testImplementation("androidx.arch.core:core-testing:2.1.0")
+    androidTestImplementation("androidx.arch.core:core-testing:2.1.0")
     // ...with Java.
     androidTestAnnotationProcessor("com.google.dagger:hilt-android-compiler:2.44")
 
@@ -92,4 +85,19 @@ dependencies {
 
     implementation("com.google.dagger:hilt-android:2.44") // Use the latest version
     kapt("com.google.dagger:hilt-android-compiler:2.44")
+
+    implementation("com.google.protobuf:protobuf-java:3.22.2")
+
+//    dependencies {
+//    androidTestImplementation("com.google.protobuf:protobuf-java:3.22.3") { // Or your desired version
+//        force = true
+//    }
+//    }
+
+//    // Optional -- Mockito framework
+//    testImplementation "org.mockito:mockito-core:5.13.0"
+//    // Optional -- mockito-kotlin
+//    testImplementation "org.mockito.kotlin:mockito-kotlin:5.13.0"
+//    // Optional -- Mockk framework
+//    testImplementation "io.mockk:mockk:5.13.0"
 }
