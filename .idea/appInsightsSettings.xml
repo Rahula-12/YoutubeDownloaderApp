@@ -8,10 +8,10 @@
             <InsightsFilterSettings>
               <option name="connection">
                 <ConnectionSetting>
-                  <option name="appId" value="PLACEHOLDER" />
-                  <option name="mobileSdkAppId" value="" />
-                  <option name="projectId" value="" />
-                  <option name="projectNumber" value="" />
+                  <option name="appId" value="com.example.youtubedownloader" />
+                  <option name="mobileSdkAppId" value="1:810212701264:android:228b967d933e3b66e68d55" />
+                  <option name="projectId" value="downloader-ae0f5" />
+                  <option name="projectNumber" value="810212701264" />
                 </ConnectionSetting>
               </option>
               <option name="signal" value="SIGNAL_UNSPECIFIED" />

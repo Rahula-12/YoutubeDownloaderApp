@@ -15,6 +15,7 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+//        throw Exception("Random Exception")
         supportActionBar?.hide()
         val navHostFragment = supportFragmentManager
             .findFragmentById(R.id.navHostFragment) as NavHostFragment
@@ -52,13 +53,13 @@ class MainActivity : AppCompatActivity() {
 
     override fun onPause() {
         super.onPause()
-        val navHostFragment = supportFragmentManager
-            .findFragmentById(R.id.navHostFragment) as NavHostFragment
-        val inflater = navHostFragment.navController.navInflater
-        val graph = inflater.inflate(R.navigation.nav_graph)
-
-
-        graph.startDestination = R.id.searchedVideos
-        navController.graph = graph
+//        val navHostFragment = supportFragmentManager
+//            .findFragmentById(R.id.navHostFragment) as NavHostFragment
+//        val inflater = navHostFragment.navController.navInflater
+//        val graph = inflater.inflate(R.navigation.nav_graph)
+//
+//
+//        graph.startDestination = R.id.searchedVideos
+//        navController.graph = graph
     }
 }

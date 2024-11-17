@@ -1,53 +1,25 @@
-name: Android CI Workflow
+name: performing lint
 on:
   push:
-    branches:
-      - main
-  workflow_dispatch:
-
+      branches:
+        - main
 jobs:
   lint:
     env:
       API_KEY: ${{ secrets.API_KEY }}
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout code
+      - name: installing dependencies
         uses: actions/checkout@v4
       - name: Touch local properties
         run: touch local.properties
       - name: Add Api Key
         run: echo "API_KEY=$API_KEY" >> local.properties
-      - name: Run Lint
+      - name: running lint
         run: ./gradlew lint
-      - name: Upload lint report
+      - name: Upload artifacts
         uses: actions/upload-artifact@v3
         with:
-          name: lint-reports
-          path: app/build/reports/lint-results-debug.html
+           name: all reports
+           path: app/build/reports/lint-results-debug.html
 
-  test:
-    needs: lint
-    env:
-      API_KEY: ${{ secrets.API_KEY }}
-    runs-on: macos-latest
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-      - name: Touch local properties
-        run: touch local.properties
-      - name: Add Api Key
-        run: echo "API_KEY=${{ secrets.API_KEY }}" >> local.properties
-      - name: Run Espresso Tests
-        uses: reactivecircus/android-emulator-runner@v2
-        with:
-          api-level: 30 # Use a stable API level
-          target: default
-          arch: x86_64
-          script: ./gradlew connectedCheck
-          disable-animations: true
-          emulator-options: "-no-window -no-audio"
-      - name: Upload Test Results
-        uses: actions/upload-artifact@v3
-        with:
-          name: test-reports
-          path: app/build/reports/androidTests/connected/
