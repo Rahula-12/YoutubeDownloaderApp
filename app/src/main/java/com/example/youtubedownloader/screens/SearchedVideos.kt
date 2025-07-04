@@ -8,6 +8,7 @@ import android.view.ViewGroup
 import androidx.annotation.RequiresApi
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.youtubedownloader.R
@@ -15,6 +16,8 @@ import com.example.youtubedownloader.databinding.FragmentSearchedVideosBinding
 import com.example.youtubedownloader.recyclerView.VideoUrlAdapter
 import com.example.youtubedownloader.viewmodel.YoutubeDownloaderViewModel
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
 
 @AndroidEntryPoint
@@ -30,6 +33,7 @@ class SearchedVideos : Fragment() {
             if(it.containsKey("videoUrl")) {
                 val bundle=Bundle()
                 bundle.putString("videoUrl",it.getString("videoUrl"))
+                it.remove("videoUrl")
                 findNavController().navigate(R.id.action_searchedVideos_to_dialogUrl,bundle)
             }
         }
@@ -44,13 +48,13 @@ class SearchedVideos : Fragment() {
         },false)
         viewModel.urlInserted.observe(viewLifecycleOwner){
             adapter.urlInserted=it
-            viewModel.urls.observe(viewLifecycleOwner){urls->
-                if(urls.isEmpty())
-                    binding.message.visibility=View.VISIBLE
-                else
-                    binding.message.visibility=View.INVISIBLE
-                adapter.submitList(urls)
-            }
+        }
+        viewModel.urls.observe(viewLifecycleOwner){urls->
+            if(urls.isEmpty())
+                binding.message.visibility=View.VISIBLE
+            else
+                binding.message.visibility=View.INVISIBLE
+            adapter.submitList(urls)
         }
         binding.recyclerView.adapter=adapter
         binding.recyclerView.layoutManager= LinearLayoutManager(context)

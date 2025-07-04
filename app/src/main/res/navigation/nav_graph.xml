@@ -18,7 +18,12 @@
     </fragment>
     <dialog android:id="@+id/dialogUrl" android:name="com.example.youtubedownloader.screens.DialogUrl"
             android:label="DialogUrl">
-        <action android:id="@+id/action_dialogUrl_to_searchedVideos" app:destination="@id/searchedVideos"/>
+        <action
+            android:id="@+id/action_dialogUrl_to_searchedVideos"
+            app:destination="@id/searchedVideos"
+            app:launchSingleTop="true"
+            app:popUpTo="@id/searchedVideos"
+            app:popUpToInclusive="false" />
     </dialog>
     <fragment android:id="@+id/homeScreen" android:name="com.example.youtubedownloader.screens.HomeScreen"
               android:label="HomeScreen" tools:layout="@layout/fragment_home_screen">

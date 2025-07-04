@@ -89,7 +89,7 @@ class OptionFragment : Fragment() {
                 .setContentText("Do you want to delete this URL?")
                 .setConfirmText("Yes")
                 .setConfirmClickListener {
-                    viewModel.deleteUrl(requireArguments().getString("url")!!)
+                    viewModel.deleteUrl(viewModel.title.value.toString())
                     it.setTitleText("Deleted!")
                         .setContentText("URL has been deleted!")
                         .setConfirmText("OK")

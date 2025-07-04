@@ -13,10 +13,10 @@ interface VideoUrlDao {
     @Insert(onConflict = OnConflictStrategy.IGNORE)
      suspend fun insertUrl(videoUrls: VideoUrls)
 
-    @Query("delete from videourls where VideoUrl=:videoUrl")
-    suspend fun deleteUrl(videoUrl:String)
+    @Query("delete from videourls where VideoTitle=:title")
+    suspend fun deleteUrl(title:String)
 
-    @Query("select * from videourls order by time desc limit 1")
+    @Query("select * from videourls order by time desc limit 1" )
     suspend fun getLatestUrl():VideoUrls
 
     @Update

@@ -10,6 +10,7 @@ import com.example.youtubedownloader.repositories.VideoUrlsDBRepository
 import com.example.youtubedownloader.repositories.VideoUrlsNetworkRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.text.SimpleDateFormat
@@ -44,7 +45,6 @@ class YoutubeDownloaderViewModel @Inject constructor(
 
     @SuppressLint("SimpleDateFormat")
     fun insertUrl(url: String) {
-        _urlInserted.value=false
         // Deleting previous URL if any and inserting the new URL into the database
         val sdf = SimpleDateFormat("dd/MM/yyyy")
         val date = sdf.format(Date()).toString()
@@ -59,15 +59,17 @@ class YoutubeDownloaderViewModel @Inject constructor(
                     time = time
                 )
             )
+            val latestVideoUrl=videoUrlsDBRepository.getLatestUrl()
             title = videoUrlsNetworkRepository.insertUrlRequestIntoQueue(
                     getYoutubeID(url)
                 )
             withContext(Dispatchers.Main) {
 //                _urlInserted.value=true
 //                _urlInserted.value=false
-                deleteUrl(url)
+                _urlInserted.value=false
+                deleteUrl(title)
             }
-            val latestVideoUrl=videoUrlsDBRepository.getLatestUrl()
+//            delay(1000)
             latestVideoUrl.videoUrl=url
             latestVideoUrl.title=title
             videoUrlsDBRepository.updateLatestUrl(latestVideoUrl)
@@ -80,20 +82,24 @@ class YoutubeDownloaderViewModel @Inject constructor(
 //                )
 //            )
             withContext(Dispatchers.Main) {
+                delay(2000)
                 _urlInserted.value=true
             }
         }
     }
 
-    fun deleteUrl(deleteUrl:String) {
+    fun deleteUrl(title:String) {
         // Deleting URL from the database
-        Log.d("deleteOut","$deleteUrl ${System.currentTimeMillis()}")
+//        Log.d("deleteOut","$deleteUrl ${System.currentTimeMillis()}")
         viewModelScope.launch(Dispatchers.IO){
-            Log.d("delete",deleteUrl)
-            videoUrlsDBRepository.deleteUrl(deleteUrl)
+//            Log.d("delete",deleteUrl)
+            videoUrlsDBRepository.deleteUrl(title)
         }
         resetAll()
     }
+
+
+
 //1709745122537
     fun assignUrls(url: String) {
         // Assigning download URL and delete URL and fetching thumbnail and title
